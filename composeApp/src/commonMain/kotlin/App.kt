@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
@@ -26,12 +27,18 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import kotlinmultiplatformrefresh.composeapp.generated.resources.Res
 import kotlinmultiplatformrefresh.composeapp.generated.resources.compose_multiplatform
+import kotlinmultiplatformrefresh.composeapp.generated.resources.eg
+import kotlinmultiplatformrefresh.composeapp.generated.resources.fr
+import kotlinmultiplatformrefresh.composeapp.generated.resources.id
+import kotlinmultiplatformrefresh.composeapp.generated.resources.jp
+import kotlinmultiplatformrefresh.composeapp.generated.resources.mx
 import kotlinx.datetime.Clock
 import kotlinx.datetime.IllegalTimeZoneException
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.DrawableResource
 
 @Composable
 @Preview
@@ -39,7 +46,6 @@ fun App() {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         var timeAtLocation by remember { mutableStateOf("No Location selected") }
-        var location by remember { mutableStateOf("Europe/Paris") }
         var showCountries by remember { mutableStateOf(false) }
 
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -77,14 +83,21 @@ fun App() {
                         showCountries = false
                     }
                 ) {
-                    countries().forEach { (name, zone) ->
+                    defaultCountries.forEach { (name, zone,image) ->
                         DropdownMenuItem(
                             onClick = {
                                 timeAtLocation = currentTimeAt(name, zone)
                                 showCountries =false
                             }
                         ) {
-                            Text(name)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painterResource(image),
+                                    modifier = Modifier.size(50.dp).padding(end = 10.dp),
+                                    contentDescription = "$name flag"
+                                )
+                                Text(name)
+                            }
                         }
                     }
                 }
@@ -112,12 +125,12 @@ fun currentTimeAt(location: String, zone: TimeZone): String {
     return "The time in $location is ${localTime.formatted()}"
 }
 
-data class Country(val name: String, val zone: TimeZone)
+data class Country(val name: String, val zone: TimeZone,val image: DrawableResource)
 
-fun countries() = listOf(
-    Country("Japan", TimeZone.of("Asia/Tokyo")),
-    Country("France", TimeZone.of("Europe/Paris")),
-    Country("Mexico", TimeZone.of("America/Mexico_City")),
-    Country("Indonesia", TimeZone.of("Asia/Jakarta")),
-    Country("Egypt", TimeZone.of("Africa/Cairo")),
+val defaultCountries = listOf(
+    Country("Japan", TimeZone.of("Asia/Tokyo"), Res.drawable.jp),
+    Country("France", TimeZone.of("Europe/Paris"), Res.drawable.fr),
+    Country("Mexico", TimeZone.of("America/Mexico_City"), Res.drawable.mx),
+    Country("Indonesia", TimeZone.of("Asia/Jakarta"), Res.drawable.id),
+    Country("Egypt", TimeZone.of("Africa/Cairo"), Res.drawable.eg)
 )
